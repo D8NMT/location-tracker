@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Sharing Request</title>
+</head>
+<body>
+    <h1>Location Sharing Request</h1>
+    <p id="status">Requesting access...</p>
+
+    <script>
+        function sendLocation(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            
+            // Construct the Google Maps link
+            const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+
+            const googleFormURL = "https://docs.google.com/forms/d/e/1FAIpQLSehBomhI4U9i1eszhIfBpMGCCc1LrOaVbOedvrFN4jo1xd9XA/formResponse"; // Your Form Response URL
+
+            // Construct URL parameters with the Google Maps link
+            const formData = new URLSearchParams();
+            formData.append("entry.142874619", mapsLink); // Replace with your correct form entry ID
+
+            // Send data to Google Form
+            fetch(googleFormURL, {
+                method: "POST",
+                body: formData,
+                mode: "no-cors" // Prevents CORS issues
+            }).then(response => {
+                document.getElementById("status").innerText = "Thank you! Your location has been sent.";
+            }).catch(error => {
+                document.getElementById("status").innerText = "Oops! There was an error sending your location.";
+            });
+        }
+
+        function requestLocation() {
+            // Custom message before requesting location
+            document.getElementById("status").innerText = "We need your location to proceed. Please allow access to your location.";
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocation, (error) => {
+                    document.getElementById("status").innerText = "Location access denied! Please enable location access.";
+                });
+            } else {
+                document.getElementById("status").innerText = "Geolocation is not supported by your browser.";
+            }
+        }
+
+        requestLocation();
+    </script>
+</body>
+</html>
